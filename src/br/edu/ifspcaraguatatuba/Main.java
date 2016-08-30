@@ -11,7 +11,7 @@ public class Main {
 		// TODO Start the program
 		
 		try {
-			UIManager.setLookAndFeel("com.jtattoo.plaf.hifi.HiFiLookAndFeel");
+			//UIManager.setLookAndFeel("com.jtattoo.plaf.hifi.HiFiLookAndFeel");
 			
 			JFrame mainFrame = new MainFrame();
 			mainFrame.setVisible(true);
