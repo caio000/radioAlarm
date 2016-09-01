@@ -1,5 +1,7 @@
 package br.edu.ifspcaraguatatuba.view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -19,8 +21,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import br.edu.ifspcaraguatatuba.control.Tocador;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class MainFrame extends JFrame {
 
@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
 	private boolean isPaused = false;
 
 	private String[] tableHeader = new String[]{"Nome","Artista","Álbum"};
-	private DefaultTableModel tableModel = new DefaultTableModel(tableHeader, 10);
+	private DefaultTableModel tableModel = new DefaultTableModel(tableHeader, 0);
 	
 	private JButton btnPause;
 	private JButton btnPlay;
@@ -55,9 +55,18 @@ public class MainFrame extends JFrame {
 
 	}
 
+	private void pegaMusicas () {
+		File arq = new File(System.getProperty("user.home") + "\\My Music");
+		
+		for (File m: arq.listFiles()) {
+			tableModel.addRow(new String[]{m.getName()});
+		}
+	}
+	
 	public MainFrame() {
 		
 		checkDiretory();
+		pegaMusicas();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Radio Relogio");
@@ -100,7 +109,7 @@ public class MainFrame extends JFrame {
 					
 					
 					try {
-						FileInputStream input = new FileInputStream(path + "\\" + arquivos[1]);
+						FileInputStream input = new FileInputStream(path + "\\" + arquivos[0]);
 						tocador = new Tocador(input);
 						tocador.play();
 					} catch (Exception e) {
@@ -139,5 +148,9 @@ public class MainFrame extends JFrame {
 		btnNext.setBounds(347, 409, 48, 48);
 		btnNext.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerNext.png")));
 		contentPane.add(btnNext);
+		
+		JLabel lblHora = new JLabel("");
+		lblHora.setBounds(117, 49, 339, 131);
+		contentPane.add(lblHora);
 	}
 }
