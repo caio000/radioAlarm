@@ -1,10 +1,15 @@
 package br.edu.ifspcaraguatatuba.view;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -13,13 +18,27 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import br.edu.ifspcaraguatatuba.control.Tocador;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
 public class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -6049993120517639162L;
 	private JPanel contentPane;
+	
+	private boolean isPaused = false;
 
 	private String[] tableHeader = new String[]{"Nome","Artista","Álbum"};
 	private DefaultTableModel tableModel = new DefaultTableModel(tableHeader, 10);
+	
+	private JButton btnPause;
+	private JButton btnPlay;
+	
+	
+	
+	private Tocador tocador;
+	
 	
 	
 	private void checkDiretory () {
@@ -53,7 +72,13 @@ public class MainFrame extends JFrame {
 		scrollPane.setBounds(10, 227, 564, 171);
 		contentPane.add(scrollPane);
 		
-		JTable table = new JTable();
+		JTable table = new JTable() {
+			private static final long serialVersionUID = 1216934504916940639L;
+
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		scrollPane.setViewportView(table);
 		table.setModel(tableModel);
 		
@@ -62,12 +87,49 @@ public class MainFrame extends JFrame {
 		btnPrevious.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerPrevious.png")));
 		contentPane.add(btnPrevious);
 		
-		JLabel btnPlay = new JLabel();
+		btnPlay = new JButton();
+		btnPlay.addMouseListener(new MouseAdapter() { // Click do botão play
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				if (btnPlay.isEnabled() && isPaused == false) {
+					String path = System.getProperty("user.home") + "\\My Music";
+					
+					File file = new File(path);
+					String[] arquivos = file.list();
+					
+					
+					try {
+						FileInputStream input = new FileInputStream(path + "\\" + arquivos[1]);
+						tocador = new Tocador(input);
+						tocador.play();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
+					
+					btnPlay.setEnabled(false);
+					btnPause.setEnabled(true);
+				} else if (btnPlay.isEnabled() && isPaused == true) {
+					tocador.resume();
+					btnPlay.setEnabled(false);
+					btnPause.setEnabled(true);
+				}
+			}
+		});
 		btnPlay.setBounds(231, 409, 48, 48);
 		btnPlay.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerPlay.png")));
 		contentPane.add(btnPlay);
 		
-		JLabel btnPause = new JLabel();
+		btnPause = new JButton();
+		btnPause.addActionListener(new ActionListener() { // Click do botão pausa
+			public void actionPerformed(ActionEvent arg0) {
+				tocador.pause();
+				isPaused = true;
+				btnPlay.setEnabled(true);
+				btnPause.setEnabled(false);
+			}
+		});
 		btnPause.setEnabled(false);
 		btnPause.setBounds(289, 409, 48, 48);
 		btnPause.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerPause.png")));

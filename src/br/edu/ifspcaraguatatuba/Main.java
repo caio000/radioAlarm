@@ -15,6 +15,9 @@ public class Main {
 			
 			JFrame mainFrame = new MainFrame();
 			mainFrame.setVisible(true);
+			
+			
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
