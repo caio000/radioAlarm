@@ -1,6 +1,9 @@
 package br.edu.ifspcaraguatatuba.control;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
@@ -18,13 +21,17 @@ public class Tocador {
 	
 	private Player player;
 	
+	private ArrayList<File> musicas;
+	
+	private Integer musicIndex = 0;
 	
 	
 	
 	
 	
-	
-	
+	public Tocador (ArrayList<File> musicas) {
+		this.musicas = musicas;
+	}
 	
 	public Tocador(final InputStream inputStream) throws JavaLayerException {
 		this.player = new Player(inputStream);
@@ -42,8 +49,13 @@ public class Tocador {
 				final Runnable r = new Runnable() {
 					@Override
 					public void run() {
-						// TODO Iniciar a musica
-						playMusic();
+						try{
+							FileInputStream fis = new FileInputStream(musicas.get(musicIndex));
+							playMusic(fis);
+						}catch (Exception e) {
+							e.printStackTrace();
+						}
+						
 					}
 				};
 				
@@ -74,10 +86,43 @@ public class Tocador {
         }
     }
 	
+	private void playMusic (final InputStream inputStream) throws JavaLayerException {
+		
+		this.player = new Player(inputStream);
+		
+		while (playerStatus != FINISHED) {
+            try {
+            	System.out.println("tocando");
+                if (!player.play(1)) {
+                	musicIndex++;
+                	System.out.println("fim da musica");
+                	play();
+                    break;
+                }
+            } catch (final JavaLayerException e) {
+                break;
+            }
+            // check if paused or terminated
+            synchronized (playerLock) {
+                while (playerStatus == PAUSED) {
+                    try {
+                        playerLock.wait();
+                    } catch (final InterruptedException e) {
+                        // terminate player
+                        break;
+                    }
+                }
+            }
+        }
+        close();
+	}
+	
 	private void playMusic () {
 		while (playerStatus != FINISHED) {
             try {
+            	System.out.println("tocando");
                 if (!player.play(1)) {
+                	System.out.println("fim da musica");
                     break;
                 }
             } catch (final JavaLayerException e) {

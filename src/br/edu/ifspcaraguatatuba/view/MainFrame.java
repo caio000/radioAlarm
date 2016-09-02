@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,7 +36,7 @@ public class MainFrame extends JFrame {
 	private JButton btnPause;
 	private JButton btnPlay;
 	
-	
+	private ArrayList<File> musicas = new ArrayList<>();
 	
 	private Tocador tocador;
 	
@@ -59,7 +60,11 @@ public class MainFrame extends JFrame {
 		File arq = new File(System.getProperty("user.home") + "\\My Music");
 		
 		for (File m: arq.listFiles()) {
-			tableModel.addRow(new String[]{m.getName()});
+			if(m.getName().endsWith(".mp3")) {
+				musicas.add(m.getAbsoluteFile());
+				tableModel.addRow(new String[]{m.getName()});
+			}
+				
 		}
 	}
 	
@@ -102,15 +107,9 @@ public class MainFrame extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 				
 				if (btnPlay.isEnabled() && isPaused == false) {
-					String path = System.getProperty("user.home") + "\\My Music";
-					
-					File file = new File(path);
-					String[] arquivos = file.list();
-					
 					
 					try {
-						FileInputStream input = new FileInputStream(path + "\\" + arquivos[0]);
-						tocador = new Tocador(input);
+						tocador = new Tocador(musicas);
 						tocador.play();
 					} catch (Exception e) {
 						e.printStackTrace();
