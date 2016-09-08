@@ -113,6 +113,7 @@ public class MainFrame extends JFrame {
 						tocador.play();
 					} catch (Exception e) {
 						e.printStackTrace();
+						System.out.println("teste");
 					}
 					
 					

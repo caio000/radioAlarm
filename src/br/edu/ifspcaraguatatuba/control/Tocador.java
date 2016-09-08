@@ -69,6 +69,27 @@ public class Tocador {
 			case PAUSED:
 				resume();
 				break;
+			case PLAYING :
+				final Runnable nextSong = new Runnable() {
+					
+					@Override
+					public void run() {
+						try {
+							FileInputStream fis = new FileInputStream(musicas.get(musicIndex));
+							playMusic(fis);
+						} catch (Exception e) {
+							e.printStackTrace();
+							close();
+						}
+					}
+				};
+				
+				final Thread ns = new Thread(nextSong);
+				ns.setPriority(Thread.MAX_PRIORITY);
+				playerStatus = PLAYING;
+				ns.start();
+				
+				break;
 
 			default:
 				break;
@@ -92,10 +113,8 @@ public class Tocador {
 		
 		while (playerStatus != FINISHED) {
             try {
-            	System.out.println("tocando");
                 if (!player.play(1)) {
                 	musicIndex++;
-                	System.out.println("fim da musica");
                 	play();
                     break;
                 }
@@ -114,33 +133,8 @@ public class Tocador {
                 }
             }
         }
-        close();
-	}
-	
-	private void playMusic () {
-		while (playerStatus != FINISHED) {
-            try {
-            	System.out.println("tocando");
-                if (!player.play(1)) {
-                	System.out.println("fim da musica");
-                    break;
-                }
-            } catch (final JavaLayerException e) {
-                break;
-            }
-            // check if paused or terminated
-            synchronized (playerLock) {
-                while (playerStatus == PAUSED) {
-                    try {
-                        playerLock.wait();
-                    } catch (final InterruptedException e) {
-                        // terminate player
-                        break;
-                    }
-                }
-            }
-        }
-        close();
+		/*System.out.println("fecha tocador");
+        close();*/
 	}
 	
 	public boolean pause() {
@@ -159,7 +153,7 @@ public class Tocador {
         try {
             player.close();
         } catch (final Exception e) {
-            // ignore, we are terminating anyway
+        	e.printStackTrace();
         }
     }
 
