@@ -39,7 +39,9 @@ public class Tocador {
 	
 	
 	
-	
+	public int getPlayerStatus () {
+		return this.playerStatus; 
+	}
 	
 	public void play() {
 		synchronized (playerLock) {

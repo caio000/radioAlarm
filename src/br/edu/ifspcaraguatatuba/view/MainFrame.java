@@ -68,6 +68,29 @@ public class MainFrame extends JFrame {
 		}
 	}
 	
+	private void checkPlayerStatus() {
+		
+		Runnable r = new Runnable() {
+			
+			@Override
+			public void run() {
+				while(tocador.getPlayerStatus() != 3) {
+					System.out.println("Tocando...");
+				}
+				
+				// ao acabar as musicas ativar o botão de play.
+				System.out.println("acabou as musicas");
+				btnPlay.setEnabled(true);
+				btnPause.setEnabled(false);
+			}
+		};
+		
+		
+		Thread thread = new Thread(r);
+		thread.setPriority(Thread.MAX_PRIORITY);
+		thread.start();
+	}
+	
 	public MainFrame() {
 		
 		checkDiretory();
@@ -111,6 +134,7 @@ public class MainFrame extends JFrame {
 					try {
 						tocador = new Tocador(musicas);
 						tocador.play();
+						checkPlayerStatus();
 					} catch (Exception e) {
 						e.printStackTrace();
 						System.out.println("teste");
