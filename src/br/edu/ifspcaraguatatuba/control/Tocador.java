@@ -39,6 +39,11 @@ public class Tocador {
 	
 	
 	
+	
+	public void setMusicIndex (int musicIndex) {
+		this.musicIndex = musicIndex;
+	}
+	
 	public int getPlayerStatus () {
 		return this.playerStatus; 
 	}

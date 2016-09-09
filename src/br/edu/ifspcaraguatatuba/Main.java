@@ -8,8 +8,6 @@ import br.edu.ifspcaraguatatuba.view.MainFrame;
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Start the program
-		
 		try {
 			UIManager.setLookAndFeel("com.jtattoo.plaf.hifi.HiFiLookAndFeel");
 			
@@ -19,7 +17,6 @@ public class Main {
 			
 			
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
 		

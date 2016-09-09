@@ -30,11 +30,12 @@ public class MainFrame extends JFrame {
 	
 	private boolean isPaused = false;
 
-	private String[] tableHeader = new String[]{"Nome","Artista","Álbum"};
+	private String[] tableHeader = new String[]{"Musica"};
 	private DefaultTableModel tableModel = new DefaultTableModel(tableHeader, 0);
 	
 	private JButton btnPause;
 	private JButton btnPlay;
+	private JTable table;
 	
 	private ArrayList<File> musicas = new ArrayList<>();
 	
@@ -98,7 +99,7 @@ public class MainFrame extends JFrame {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Radio Relogio");
-		setBounds(100, 100, 600, 500);
+		setBounds(100, 100, 377, 500);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -106,23 +107,48 @@ public class MainFrame extends JFrame {
 		setContentPane(contentPane);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 227, 564, 171);
+		scrollPane.setBounds(10, 227, 339, 171);
 		contentPane.add(scrollPane);
 		
-		JTable table = new JTable() {
+		table = new JTable() {
 			private static final long serialVersionUID = 1216934504916940639L;
 
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
+		table.addMouseListener(new MouseAdapter() { // click na tabela
+			@Override
+			public void mouseClicked(MouseEvent mouse) {
+				
+				// verifica se o mouse foi clicado duas vezes
+				if (mouse.getClickCount() == 2) {
+					// TODO implementar função que inicia a musica selecionada
+					int line = table.getSelectedRow();
+					
+					if (tocador != null) {
+						System.out.println("inicia a musica");
+						tocador.close();
+						tocador.setMusicIndex(line);
+						tocador.play();
+						
+					} else {
+						tocador = new Tocador(musicas);
+						tocador.setMusicIndex(line);
+						tocador.play();
+						
+						btnPlay.setEnabled(false);
+						btnPause.setEnabled(true);
+					}
+					
+					
+					
+				}
+				
+			}
+		});
 		scrollPane.setViewportView(table);
 		table.setModel(tableModel);
-		
-		JLabel btnPrevious = new JLabel();
-		btnPrevious.setBounds(173, 409, 48, 48);
-		btnPrevious.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerPrevious.png")));
-		contentPane.add(btnPrevious);
 		
 		btnPlay = new JButton();
 		btnPlay.addMouseListener(new MouseAdapter() { // Click do botão play
@@ -150,7 +176,7 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		btnPlay.setBounds(231, 409, 48, 48);
+		btnPlay.setBounds(127, 409, 48, 48);
 		btnPlay.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerPlay.png")));
 		contentPane.add(btnPlay);
 		
@@ -164,17 +190,22 @@ public class MainFrame extends JFrame {
 			}
 		});
 		btnPause.setEnabled(false);
-		btnPause.setBounds(289, 409, 48, 48);
+		btnPause.setBounds(185, 409, 48, 48);
 		btnPause.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerPause.png")));
 		contentPane.add(btnPause);
 		
-		JLabel btnNext = new JLabel();
-		btnNext.setBounds(347, 409, 48, 48);
-		btnNext.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerNext.png")));
-		contentPane.add(btnNext);
-		
 		JLabel lblHora = new JLabel("");
-		lblHora.setBounds(117, 49, 339, 131);
+		lblHora.setBounds(10, 10, 339, 131);
 		contentPane.add(lblHora);
+		
+		JLabel btnAddMusic = new JLabel("");
+		btnAddMusic.setBounds(10, 184, 32, 32);
+		btnAddMusic.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/Add.png")));
+		contentPane.add(btnAddMusic);
+		
+		JLabel btnRemoveMusic = new JLabel("");
+		btnRemoveMusic.setBounds(52, 184, 32, 32);
+		btnRemoveMusic.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/Delete.png")));
+		contentPane.add(btnRemoveMusic);
 	}
 }
