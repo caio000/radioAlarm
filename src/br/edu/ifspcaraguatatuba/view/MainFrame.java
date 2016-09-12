@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,12 +12,15 @@ import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
 import br.edu.ifspcaraguatatuba.control.Tocador;
@@ -45,7 +47,7 @@ public class MainFrame extends JFrame {
 	
 	private void checkDiretory () {
 		String dir = System.getProperty("user.home");
-		Path path = Paths.get(dir + "\\My Music");
+		Path path = Paths.get(dir + "/My Music");
 		
 		if (!Files.exists(path)) {
 			try {
@@ -58,7 +60,7 @@ public class MainFrame extends JFrame {
 	}
 
 	private void pegaMusicas () {
-		File arq = new File(System.getProperty("user.home") + "\\My Music");
+		File arq = new File(System.getProperty("user.home") + "/My Music");
 		
 		for (File m: arq.listFiles()) {
 			if(m.getName().endsWith(".mp3")) {
@@ -79,7 +81,7 @@ public class MainFrame extends JFrame {
 					System.out.println("Tocando...");
 				}
 				
-				// ao acabar as musicas ativar o botão de play.
+				// ao acabar as musicas ativar o botï¿½o de play.
 				System.out.println("acabou as musicas");
 				btnPlay.setEnabled(true);
 				btnPause.setEnabled(false);
@@ -123,7 +125,7 @@ public class MainFrame extends JFrame {
 				
 				// verifica se o mouse foi clicado duas vezes
 				if (mouse.getClickCount() == 2) {
-					// TODO implementar função que inicia a musica selecionada
+					// TODO implementar funï¿½ï¿½o que inicia a musica selecionada
 					int line = table.getSelectedRow();
 					
 					if (tocador != null) {
@@ -151,24 +153,28 @@ public class MainFrame extends JFrame {
 		table.setModel(tableModel);
 		
 		btnPlay = new JButton();
-		btnPlay.addMouseListener(new MouseAdapter() { // Click do botão play
+		btnPlay.addMouseListener(new MouseAdapter() { // Click do botï¿½o play
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
 				if (btnPlay.isEnabled() && isPaused == false) {
 					
 					try {
-						tocador = new Tocador(musicas);
-						tocador.play();
-						checkPlayerStatus();
+						
+						if (musicas.size() > 0) {
+							tocador = new Tocador(musicas);
+							tocador.play();
+							checkPlayerStatus();
+							
+							btnPlay.setEnabled(false);
+							btnPause.setEnabled(true);
+						} else {
+							throw new Exception("NÃ£o hÃ¡ nenhuma musica para tocar");
+						}
 					} catch (Exception e) {
 						e.printStackTrace();
-						System.out.println("teste");
+						JOptionPane.showMessageDialog(null, e.getMessage());
 					}
-					
-					
-					btnPlay.setEnabled(false);
-					btnPause.setEnabled(true);
 				} else if (btnPlay.isEnabled() && isPaused == true) {
 					tocador.resume();
 					btnPlay.setEnabled(false);
@@ -181,7 +187,7 @@ public class MainFrame extends JFrame {
 		contentPane.add(btnPlay);
 		
 		btnPause = new JButton();
-		btnPause.addActionListener(new ActionListener() { // Click do botão pausa
+		btnPause.addActionListener(new ActionListener() { // Click do botï¿½o pausa
 			public void actionPerformed(ActionEvent arg0) {
 				tocador.pause();
 				isPaused = true;
@@ -199,11 +205,51 @@ public class MainFrame extends JFrame {
 		contentPane.add(lblHora);
 		
 		JLabel btnAddMusic = new JLabel("");
+		btnAddMusic.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				// TODO selecionar a musica e mover para a pasta de musicas do sistema.
+				
+				JFileChooser fc = new JFileChooser();
+				fc.addChoosableFileFilter(new FileNameExtensionFilter("Mp3 Files", "mp3"));
+				fc.setAcceptAllFileFilterUsed(false);
+				
+				int result = fc.showOpenDialog(contentPane);
+				
+				// verifica se o arquivo foi selecionado.
+				if (result == JFileChooser.APPROVE_OPTION) {
+					
+					File selectedFile = fc.getSelectedFile();
+					musicas.add(selectedFile);
+					tableModel.addRow(new String[]{selectedFile.getName()});
+				}
+				
+			}
+		});
 		btnAddMusic.setBounds(10, 184, 32, 32);
 		btnAddMusic.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/Add.png")));
 		contentPane.add(btnAddMusic);
 		
 		JLabel btnRemoveMusic = new JLabel("");
+		btnRemoveMusic.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				
+				try {
+					int row = table.getSelectedRow(); // pega a linha da tabela que o usuÃ¡rio clicou.
+					
+					if (row >= 0) {
+						musicas.remove(row);
+						tableModel.removeRow(row);
+					} else 
+						throw new Exception("Selecione uma musica");
+				}catch (Exception e) {
+					JOptionPane.showMessageDialog(contentPane, e.getMessage());
+				}
+				
+			}
+		});
 		btnRemoveMusic.setBounds(52, 184, 32, 32);
 		btnRemoveMusic.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/Delete.png")));
 		contentPane.add(btnRemoveMusic);
