@@ -23,7 +23,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 
+import br.edu.ifspcaraguatatuba.control.Relogio;
 import br.edu.ifspcaraguatatuba.control.Tocador;
+import java.awt.Font;
+import javax.swing.SwingConstants;
 
 public class MainFrame extends JFrame {
 
@@ -38,10 +41,21 @@ public class MainFrame extends JFrame {
 	private JButton btnPause;
 	private JButton btnPlay;
 	private JTable table;
+	private JLabel lblHora;
 	
 	private ArrayList<File> musicas = new ArrayList<>();
 	
 	private Tocador tocador;
+	
+	private Relogio relogio;
+	
+	
+	
+	public MainFrame() {
+		initComponent();
+		relogio = new Relogio(this.lblHora);
+		relogio.start();
+	}
 	
 	
 	
@@ -94,7 +108,7 @@ public class MainFrame extends JFrame {
 		thread.start();
 	}
 	
-	public MainFrame() {
+	public void initComponent() {
 		
 		checkDiretory();
 		pegaMusicas();
@@ -130,7 +144,7 @@ public class MainFrame extends JFrame {
 					
 					if (tocador != null) {
 						System.out.println("inicia a musica");
-						tocador.close();
+						tocador.pause();
 						tocador.setMusicIndex(line);
 						tocador.play();
 						
@@ -200,16 +214,16 @@ public class MainFrame extends JFrame {
 		btnPause.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/PlayerPause.png")));
 		contentPane.add(btnPause);
 		
-		JLabel lblHora = new JLabel("");
-		lblHora.setBounds(10, 10, 339, 131);
+		lblHora = new JLabel("");
+		lblHora.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHora.setFont(new Font("DejaVu Serif", Font.BOLD, 40));
+		lblHora.setBounds(10, 43, 355, 98);
 		contentPane.add(lblHora);
 		
 		JLabel btnAddMusic = new JLabel("");
-		btnAddMusic.addMouseListener(new MouseAdapter() {
+		btnAddMusic.addMouseListener(new MouseAdapter() { // Botão adicionar musica
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				
-				// TODO selecionar a musica e mover para a pasta de musicas do sistema.
 				
 				JFileChooser fc = new JFileChooser();
 				fc.addChoosableFileFilter(new FileNameExtensionFilter("Mp3 Files", "mp3"));
@@ -232,7 +246,7 @@ public class MainFrame extends JFrame {
 		contentPane.add(btnAddMusic);
 		
 		JLabel btnRemoveMusic = new JLabel("");
-		btnRemoveMusic.addMouseListener(new MouseAdapter() {
+		btnRemoveMusic.addMouseListener(new MouseAdapter() { // Botão de remover
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				
@@ -253,5 +267,31 @@ public class MainFrame extends JFrame {
 		btnRemoveMusic.setBounds(52, 184, 32, 32);
 		btnRemoveMusic.setIcon(new ImageIcon(MainFrame.class.getResource("/br/edu/ifspcaraguatatuba/image/Delete.png")));
 		contentPane.add(btnRemoveMusic);
+		
+		JButton btnFalarHora = new JButton("Falar hora");
+		btnFalarHora.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				String file = "HRS" + relogio.getDate().getHours() + ".mp3";
+				String file2 = "MIN" + relogio.getDate().getMinutes() + ".mp3";
+				String path = System.getProperty("user.dir") + "/voices_time/";
+				
+				String audioHora = path + file;
+				String audioMin  = path + file2;
+				
+				ArrayList<File> horas = new ArrayList<>();
+				horas.add(new File(audioHora));
+				horas.add(new File(audioMin));
+				
+				Tocador falaHora = new Tocador(horas);
+				falaHora.play();
+				
+				
+				System.out.println(path);
+			}
+		});
+		btnFalarHora.setBounds(203, 190, 117, 25);
+		contentPane.add(btnFalarHora);
+		
 	}
 }
